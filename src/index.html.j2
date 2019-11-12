@@ -1,0 +1,9 @@
+{% extends "base.html.j2" %}
+
+{% set title="Blog" %}
+
+{% block content %}
+    {% for it in entries %}
+    <p>{{ it.date }}: <a href="{{ it.url }}">{{ it.title }}</a></p>
+    {% endfor %}
+{% endblock %}

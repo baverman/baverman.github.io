@@ -1,0 +1,11 @@
+{% extends "base.html.j2" %}
+
+{% set title=meta.title %}
+
+{% block content %}
+<header>
+    <h1>{{ meta.title }}</h1>
+    <p>{{ meta.date }}</p>
+</header>
+{{ content }}
+{% endblock %}

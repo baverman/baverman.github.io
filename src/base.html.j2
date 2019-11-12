@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="{{ lang | d('') }}">
+
+<head>
+    <meta charset="utf-8">
+    <title>{{ title | d('') }}</title>
+    <meta name="description" content="{{ description | d('') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        html {
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        body {
+            color: #222;
+            line-height: 1.5;
+            max-width: 45rem;
+            margin: 0 auto;
+            font-family: "Helvetica", "Arial", sans-serif;
+            padding: 1rem 1rem 2rem;
+        }
+
+        h1, h2, h3 {
+            margin-top: 2em;
+            margin-bottom: 0.7em;
+            font-family: "Georgia", serif;
+            font-weight: normal;
+        }
+
+        h1 { font-size: 1.6rem; margin-top: 0}
+        h2 { font-size: 1.4rem; font-variant: small-caps; }
+        h3 { font-size: 1.2rem; font-variant: small-caps; }
+
+
+        a { color: #005bc7; }
+        a:hover { color: #5793e6; }
+
+        header { margin-bottom: 2rem; }
+
+            header h1 {
+                margin: 0 0 0.5rem;
+                line-height: 1.2;
+            }
+
+            header p {
+                margin: 0;
+                color: #777;
+                font-size: 0.9rem;
+                font-style: italic;
+                font-family: "Georgia", serif;
+            }
+
+        .highlight {
+            background-color: #fafafa;
+            padding: 0.7em 0.7em;
+            border: 1px solid #ddd;
+            border-left: 2px solid #aac;
+            overflow-x: auto;
+        }
+
+            .highlight pre {
+                margin: 0;
+            }
+
+        nav {
+            margin-bottom: 1.5rem;
+        }
+
+            nav a {
+                color: #555;
+                font-variant: small-caps;
+                text-decoration: none;
+                margin-right: 1.5rem;
+            }
+
+        {{ hl_styles }}
+    </style>
+</head>
+
+<body>
+  <nav>
+      <a href="/">Blog</a>
+      <a href="/projects.html">Projects</a>
+  </nav>
+  {% block content %}{{ content }}{% endblock %}
+</body>
+
+</html>
