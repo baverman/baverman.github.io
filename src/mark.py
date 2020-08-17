@@ -2,12 +2,12 @@
 import os.path
 import markdown
 import jinja2
-import argparse
 import operator
 import fcntl
 import json
 from functools import lru_cache
 from contextlib import contextmanager
+from datetime import datetime
 
 from pygments import style, formatters
 
@@ -20,6 +20,7 @@ extensions = [
     'full_yaml_metadata',
     'toc',
 ]
+
 
 extension_configs = {
     # 'pymdownx.highlight': {
@@ -67,6 +68,13 @@ def process(text):
     return html, md.Meta
 
 
+def parse_date(val):
+    try:
+        return datetime.strptime(val, '%Y-%m-%d %H:%M')
+    except ValueError:
+        return datetime.strptime(val, '%Y-%m-%d')
+
+
 def render_one(text, template):
     html, meta = process(text)
     if template:
@@ -81,6 +89,7 @@ def parse_meta(fname):
     data = [it for it in data.values() if os.path.exists(it['fname'])]
     result = []
     for meta in data:
+        meta['date'] = datetime.fromtimestamp(meta['date'])
         if not meta.get('draft'):
             result.append(meta)
     result.sort(key=operator.itemgetter('date'), reverse=True)
@@ -115,40 +124,10 @@ def update_meta(metaname, fname, meta, start_dir):
             data = json.load(open(metaname))
         else:
             data = {}
-        meta['date'] = str(meta['date'])
+        meta['date'] = parse_date(meta['date']).timestamp()
         meta['fname'] = fname
         meta['url'] = '/' + os.path.relpath(fname, start_dir)[:-3] + '.html'
         if data.get(fname) != meta:
             data[fname] = meta
             with open(metaname, 'w') as f:
                 json.dump(data, f, ensure_ascii=False)
-
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-t', dest='template')
-    parser.add_argument('-o', dest='output')
-    parser.add_argument('--start-dir', default='START_DIR')
-    parser.add_argument('--meta')
-    parser.add_argument('--index', dest='index', action='store_true')
-    parser.add_argument('--tags', dest='tags')
-    parser.add_argument('input')
-    args = parser.parse_args()
-
-    if args.index:
-        assert args.output
-        render_index(args.input, args.template, args.output, args.tags)
-    else:
-        text = open(args.input).read()
-        content, meta = render_one(text, args.template)
-        if args.meta:
-            update_meta(args.meta, args.input, meta, args.start_dir)
-
-        if args.output:
-            with open(args.output, 'w') as f:
-                f.write(content)
-        else:
-            print(content)
-
-if __name__ == '__main__':
-    main()

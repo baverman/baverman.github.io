@@ -1,8 +1,8 @@
 ---
-date: 2019-11-06
+date: 2019-11-06 00:01
 draft: false
 title: Как полюбить coverage и писать надежные тесты
-tags: ['python', 'testing', 'coverage', 'boo']
+tags: ['python', 'testing', 'coverage']
 ...
 
 Все мы знаем что тесты это полезно, но мало кому нравится их делать.

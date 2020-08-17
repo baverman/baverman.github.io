@@ -8,4 +8,9 @@
     <p>{{ meta.date }}</p>
 </header>
 {{ content }}
+{% if meta.tags %}
+    <p class="tags">{% for t in meta.tags %}
+        <a href="/blog/tags/{{ t }}.html">{{ t }}</a>
+    {% endfor %}</p>
+{% endif %}
 {% endblock %}

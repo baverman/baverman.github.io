@@ -1,5 +1,5 @@
 ---
-date: 2019-10-01
+date: 2019-10-01 00:00
 draft: true
 title: Some long post about very important staf on a planet Earth
 tags: ['test', 'python', 'markdown']

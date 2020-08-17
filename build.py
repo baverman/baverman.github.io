@@ -126,6 +126,7 @@ class Rule(object):
 
     def execute(self, target, dep):
         if callable(self.cmd):
+            print(self.cmd.__name__, dep.reqs, '->', target)
             self.cmd(self, target, dep)
         else:
             l = {'target': target, 'reqs': dep.reqs,
@@ -136,11 +137,17 @@ class Rule(object):
                 print(' '.join(map(shlex.quote, ecmd)))
                 subprocess.check_call(ecmd)
 
-    def get_hash(self):
+    def get_hash(self, target, dep):
         if callable(self.cmd):
             data = self.cmd.__code__.co_code
         else:
-            data = '|'.join(self.cmd).encode()
+            l = {'target': target, 'reqs': dep.reqs,
+                 'req': dep.reqs and dep.reqs[0]}
+            l.update(self.params)
+            data = []
+            for cmd in self.cmd:
+                data.append(' '.join(eval_cmd(cmd, self.globals, l)))
+            data = '|'.join(data).encode()
         return md5(data).hexdigest()
 
 
@@ -280,7 +287,7 @@ def process_target(target, tstate, state, always_make):
 
         rhash = rstate.get('hash')
         if not do and rhash:
-            do = dep.rule.get_hash() != rhash
+            do = dep.rule.get_hash(target, dep) != rhash
 
     if not do:
         if not direct:  # order only deps
@@ -295,7 +302,7 @@ def process_target(target, tstate, state, always_make):
             dname and makedirs(dname)
 
         rstate['ts'] = time()
-        rstate['hash'] = dep.rule.get_hash()
+        rstate['hash'] = dep.rule.get_hash(target, dep)
         dep.rule.execute(target, dep)
 
     state[target] = 'new'
@@ -335,9 +342,12 @@ def main():  # pragma: no cover
     args = parser.parse_args()
 
     sys.modules['build'] = sys.modules['__main__']
-    runpy.run_path(args.rules)
 
-    state_file = os.path.join(os.path.dirname(args.rules), '.build-state')
+    rules_file = os.path.abspath(args.rules)
+    os.chdir(os.path.dirname(rules_file))
+    runpy.run_path(rules_file)
+
+    state_file = os.path.join(os.path.dirname(rules_file), '.build-state')
     if os.path.exists(state_file):
         tstate = json.load(open(state_file))
     else:
