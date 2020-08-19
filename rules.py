@@ -22,11 +22,11 @@ make(image_dirs,
 
 @make(blog, 'src/blog/post.html.j2')
 def section_blog(rule, target, dep):
-    render_markdown(target, dep.reqs[0], dep.reqs[1], meta=blog_meta)
+    mark.render_md(dep.reqs[0], dep.reqs[1], target, meta=blog_meta)
 
 @make(projects, ['src/projects.md', 'src/page.html.j2'])
 def section_projects(rule, target, dep):
-    render_markdown(target, dep.reqs[0], dep.reqs[1])
+    mark.render_md(dep.reqs[0], dep.reqs[1], target)
 
 @make(index, [blog_meta, 'src/index.html.j2'])
 def section_index(rule, target, dep):
@@ -40,14 +40,3 @@ make('all', [index, projects, image_dirs.dest], phony=True)
 
 make('push', 'all', phony=True,
      cmd='rsync -zPr {dest}/. bvrmn.com:~/sites/bvrmn.com/')
-
-
-def render_markdown(target, infile, template, meta=None):
-    text = open(infile).read()
-    content, metadata = mark.render_one(text, template)
-
-    if meta:
-        mark.update_meta(meta, infile, metadata, 'src')
-
-    with open(target, 'w') as f:
-        f.write(content)

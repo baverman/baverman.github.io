@@ -84,6 +84,17 @@ def render_one(text, template):
     return html, meta
 
 
+def render_md(infile, template, outfile, meta=None):
+    text = open(infile).read()
+    content, metadata = render_one(text, template)
+
+    if meta:
+        update_meta(meta, infile, metadata, 'src')
+
+    with open(outfile, 'w') as f:
+        f.write(content)
+
+
 def parse_meta(fname):
     data = json.load(open(fname))
     data = [it for it in data.values() if os.path.exists(it['fname'])]
